@@ -1,3 +1,4 @@
+# coding=utf-8
 
 ###############################################################################################
 ### Generate text result of chemical search using 100,250,500 and 1000 molecules using
@@ -6,7 +7,7 @@
 ### 1 Nov 2014
 ### usage : python profile.py
 ##############################################################################################
-import datetime
+
 import random
 import time
 import numpy as np
@@ -14,7 +15,11 @@ import pymongo
 
 
 def choose_random(N):
-    """Choose 1000 random molecules from the database."""
+    """Choose 1000 random molecules from the database.
+
+    :param N : Integer  Number of random molecules
+
+    """
     db = pymongo.MongoClient('localhost',27020).chembldb
     # Get all CHEMBL IDs
     db.molecules.ensure_index('chembl_id')
@@ -24,13 +29,21 @@ def choose_random(N):
     rands = random.sample(chembl_ids, N)
     return(rands)
 
-def similarity(qfp, threshold=0.8):
+def similarity(qfp,db, threshold=0.8):
+    """
+    Perform similarity search using the aggregate function
+
+    :param qfp:  query fingerprint
+    :param db: A mongo database connection
+    :param threshold: integer similarity threshold
+    :return: return aggregated results similarity scores , chembl_ids
+
+    """
     qn = len(qfp)                           # Number of bits in query fingerprint
     qmin = int(qn * threshold)               # Minimum number of bits in results fingerprints
     qmax = int(qn / threshold)               # Maximum number of bits in results fingerprints
     ncommon = qn - qmin + 1                 # Number of fingerprint bits in which at least 1 must be in common
     reqbits = [count['_id'] for count in db.mfp2_counts.find({'_id': {'$in': qfp}}).sort('count', 1).limit(ncommon)]
-    #reqbits = qfp[:ncommon]
     aggregate = [
         {'$match': {'mfp2.count': {'$gte': qmin, '$lte': qmax}, 'mfp2.bits': {'$in': reqbits}}},
         {'$project': {
@@ -47,6 +60,12 @@ def similarity(qfp, threshold=0.8):
     return response['result']
 
 def profile_mongodb(chembl_ids):
+
+    """
+    Do multiple molecules queries and generates report on mean , median and 95th percentile timings
+    :param chembl_ids: set of chembl_ids against which similarity search will be performed
+
+    """
     db = pymongo.MongoClient('localhost',27020).chembldb
     size=len(chembl_ids)
     for threshold in [0.65,0.75,0.85,0.95]:
@@ -84,6 +103,9 @@ def profile_mongodb(chembl_ids):
             f.write(report)
 
 if __name__ == '__main__':
+
+    # number of molecules to run multiple molecule queries
+
     n=[100,250,500,1000]
     for i in n:
         rands=choose_random(N=i)

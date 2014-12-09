@@ -3,12 +3,18 @@
 ###  Abhik Seal
 ###  1 Nov 2014
 ###############################################################################################
+
 import cloudmesh
 import sys
 import os
 
-# Creating cloud on India server
+# Creating VMs  on India server
+
 def createVM(N):
+    """
+    :param N: Integer total number of VMs to start
+
+    """
     username = cloudmesh.load().username()
     print username
     mesh = cloudmesh.mesh("mongo")
@@ -16,7 +22,6 @@ def createVM(N):
     cloudmesh.shell("cloud on india")
     flavor = mesh.flavor('india', 'm1.large')
     image=mesh.image('india','futuregrid/ubuntu-14.04')
-    #vm_ip=[]
     for i in range(0,N):
         result = mesh.start(cloud='india',
                         cm_user_id=username,
@@ -25,7 +30,7 @@ def createVM(N):
         server = result['server']['id']
         ip=mesh.assign_public_ip('india', server, username)
         print ip
-        #vm_ip.append(ip)
+
         try:
             result = mesh.wait(ipaddr=ip, command="ls -al", interval=10, retry=5)
             cloudmesh.banner("INSTALLING MONGO TO THE VM  "+str(ip))
@@ -42,10 +47,10 @@ def createVM(N):
             print "Authentication failed when connecting to %s" % ip
             sys.exit(1)
     print "All VMs Mongo Installed.. "
-    #return(vm_ip)
 
 
 
 if __name__ == '__main__':
-    
+
+    ## call createVM to start VMs
     createVM(N=3)

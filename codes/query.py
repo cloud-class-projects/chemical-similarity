@@ -1,12 +1,42 @@
 ##############################################################################
 ### Searching the mongodb database with RDKit chemical fingerprints
-### This performs searching with a single query in smiles
+### This performs searching with a single query in smiles format
 ###
 ### Abhik Seal
-### 30 Jul 2014
+### 1 November 2014
 ### Code taken from Matt Swain's github https://github.com/mcs07/mongodb-chemistry
 ###
 ##############################################################################
+
+"""
+usage: query.py [-h] --db DB --smi SMI [--fpSize FPSIZE] --fpname FPNAME
+                [--t T] [--tag TAG]
+                {morgan,rdkfp,rdmaccs} ...
+
+Search MongoDB database
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --db DB               Input Database Name
+  --smi SMI             Enter the smiles string
+  --fpSize FPSIZE       Length of the fingerprints
+  --fpname FPNAME       Name of the fp ex:mfp1,mfp2 .. etc
+  --t T                 Similarity threshold
+  --tag TAG             tag name in the original database Ex:chembl_id
+
+subcommands:
+  valid subcommands
+
+  {morgan,rdkfp,rdmaccs}
+                        additional help
+    morgan              Generate Morgan type fingerprints
+    rdkfp               Generate RDKFingerprint
+    rdmaccs             Generate MACCS Keys
+
+  example : python monQuery.py --db chemtest --smi 'CC1=NN=C2N1C3=C(C=C(C=C3)Cl)C(=NC2)C4=CC=CC=C4' --fpSize 512
+            --fpname mfp1 --t 0.8 --tag chembl_id morgan --radius 2
+
+"""
 
 import pymongo
 from rdkit import Chem

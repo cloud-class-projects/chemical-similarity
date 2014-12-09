@@ -1,3 +1,4 @@
+# coding=utf-8
 ###############################################################################################
 ### Adding fingerprints to mongodb database with RDKit chemical fingerprints
 ### This code is similar to db_build.py it is only used if we already have a database of 
@@ -5,32 +6,57 @@
 ###
 ### Abhik Seal
 ### 1 Nov 2014
-###
 ##############################################################################################
+
+"""
+usage: addfps.py [-h] --db DB [--fpSize FPSIZE] --fpname FPNAME
+                 {morgan,rdkfp,rdmaccs} ...
+
+Generate fingerprints for a Given database in MongoDB
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --db DB               Input Database Name
+  --fpSize FPSIZE       Length of the fingerprints
+  --fpname FPNAME       Name of the fp ex:mfp1,mfp2 .. etc
+
+subcommands:
+  valid subcommands
+
+  {morgan,rdkfp,rdmaccs}
+                        additional help
+    morgan              Generate Morgan type fingerprints
+    rdkfp               Generate RDKFingerprint
+    rdmaccs             Generate MACCS Keys
+
+    example : python addfps.py --db chemtest --fpSize 1024 --fpname mfp2 morgan
+
+"""
 
 import uuid
 import pymongo
 from bson.binary import Binary
-import gzip
 from rdkit import Chem
 from rdkit.Chem import AllChem
 import os.path
-import io
 import argparse
 from rdkit.Chem import MACCSkeys
-import re
 
 def add_fps(fpname,**param):
-    """Generate fingerprints for every molecule in the database.
+    """
+    Generate fingerprints for every molecule in the database.
+    Each fingerprint is stored as an array of "on" bits, along with the total count of this array.
 
-       Each fingerprint is stored as an array of "on" bits, along with the total count of this array.
+    :param param: add multiple parameters when morgan or rdkfp is used
+    :param fpname: name of the fingerprint by which the fingerprints will be stored in mongo db
+
     """
     min =param.get('minPath')
     max =param.get('maxPath')
     nbitsh=param.get('nBits')
     rad=param.get('rad')
     fpsize=param.get('fpSize')
-    #print type(rad),type(fpsize)
+
     if rad is not None :
         for molecule in db.molecules.find({str(fpname): {'$exists': False}}, timeout=False):
             rdmol = Chem.Mol(molecule['rdmol'])
@@ -57,11 +83,14 @@ def add_fps(fpname,**param):
         print ("fingerprints %s done ..." % fpname)
 
 def count_fps(fpname):
-    """Build collection containing total counts of all occurrences of each fingerprint bit.
-
+    """
+    Build collection containing total counts of all occurrences of each fingerprint bit.
     This creates a collection that stores counts of the number of times each individual bit occurs in the molecules
     collection. This is used for an efficiency shortcut. The resulting documents have an _id that corresponds to the
     fingerprint bit and a single count field. (e.g. { "_id" : 511, "count" : 148 })
+
+    :param fpname: name of the fingerprint by which the fingerprints will be stored in mongo db
+
     """
     for fp in [str(fpname)]:
         db['{}_counts'.format(fp)].drop()
@@ -74,7 +103,12 @@ def count_fps(fpname):
 
 
 def ensure_indices(fpname):
-    """Build index on relevant fields."""
+    """
+    Build index on relevant fields.
+
+    :param fpname: name of the fingerprint by which the fingerprints will be stored in mongo db
+
+    """
     fpb=str(fpname)+'.bits'
     fpc=str(fpname)+'.count'
     print ("Building Indices...")
@@ -83,8 +117,10 @@ def ensure_indices(fpname):
 
 
 if __name__ == '__main__':
+
     """
-    Using command line arguments
+       Using command line arguments
+
     """
     parser = argparse.ArgumentParser(description="Generate fingerprints for a Given database in MongoDB")
     parser.add_argument("--db", required=True, help="Input Database Name")
