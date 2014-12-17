@@ -48,14 +48,44 @@ db\_build.py is a command line argument program where one can input .sdf,.sdf.gz
 
 #### Usage of db_build.py
 ```
-python db_build.py -h
+$ python db_build.py -h
+usage: db_build.py [-h] --i I --db DB [--tag TAG] [--fpSize FPSIZE]
+                   [--fpname FPNAME]
+                   {morgan,rdkfp,rdmaccs} ...
 python db_build.py --db moltest--i benzodiazepine.smi --tag chembl_id --fpname mfp1 morgan
+
+## To generate morgan type fingerprints with default parameters and fpSize 1024  
+$ python dbbuild.py --db moltest --i benzodiazepine.smi --tag chembl_id 
+                    --fpSize 1024 --fpname mfp2 morgan    
+                    
+## To generate morgan type fingerprints with fpSize 1024 and radius of 4
+$ python db_build.py --db moltest --i benzodiazepine.smi --tag chembl_id 
+                    --fpSize 1024 --fpname mfp3 morgan --radius 4
+
+## For this projet we used chembl.sdf which has ~1.3 million molecules
+## To generate morgan type fingerprints with radius 2 into chembldb database.
+python db_build.py --db chembldb --i chembl.sdf --tag chembl_id fpname mfp1 morgan
+
 ```
-
+Once the database is built with one fingerprint addfps.py can be called to generate more fingerprints over the molecular data. This way multiple fingerprints can be generated and stored. The code for addfps.py is stored in codes folder. The code is almost similar to db\_buildy but here you need to specify the database for which you will generate the fingerprint. Currently addfps.py supports morgan type, RDKFingerprint and maccs keys fingerprints. To execute it, 
+```
 python addfps.py -h
-
 python addfps.py --db moltest --fpSize 1024 --fpname mfp2 morgan
-
+```
+Now to see everything is working fine we should go to Mongos machine and login using the admin and check wether the chembldb is created along with molecules and mfp1_counts collections.
+```
+## Go to the mongo terminal and check chembldb is created
+> show dbs
+admin       (empty)
+chembldb    11.15GB
+local       0.078GB
+> use chembldb
+# Shows the mfp_1 counts are generated.
+> show collections 
+mfp1_counts
+molecules
+system.indexes
+```
 python query.py -h
 
 python query.py --db chembldb --smi 'CC1=NN=C2N1C3=C(C=C(C=C3)Cl)C(=NC2)C4=CC=CC=C4' --fpSize 512 --fpname mfp1 --t 0.5 --tag chembl_id morgan --radius 2
