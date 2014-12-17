@@ -148,8 +148,7 @@ if __name__ == '__main__':
 
     dbconn="pymongo.MongoClient('localhost', 27017)."+ args['db']
     db = eval(dbconn)
-    db.admin.command(
-        'shardCollection', args['db']+'.'+args['fpname'], key={'_id': hashed})
+    db.admin.command('shardCollection', args['db']+'.'+args['fpname'], key={'_id': hashed})
     if args['which'] == 'morgan':
         if args['fpSize'] is None and args['radius'] is None:
             add_fps(args['fpname'],fpSize=512,rad=2)
