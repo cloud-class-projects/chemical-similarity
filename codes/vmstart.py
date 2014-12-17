@@ -51,6 +51,11 @@ def createVM(N):
 
 
 if __name__ == '__main__':
-
-    ## call createVM to start VMs
-    createVM(N=3)
+    """
+    Using command line arguments
+    """
+    parser = argparse.ArgumentParser(description="Starting Multiple VMs on India cloud")
+    parser.add_argument("--vm", type=int, required=True, help="Total number of VMs to start")
+    #parser.add_argument("--flavor",type=str , help="What type of flavor eg m1.medium, m1.large .. ",default='m1.medium')
+    args = vars(parser.parse_args())
+    createVM(args['vm'])
