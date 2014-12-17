@@ -83,12 +83,32 @@ local       0.078GB
 # Shows the mfp_1 counts are generated.
 > show collections 
 mfp1_counts
+mfp2_counts
 molecules
 system.indexes
 ```
-python query.py -h
 
-python query.py --db chembldb --smi 'CC1=NN=C2N1C3=C(C=C(C=C3)Cl)C(=NC2)C4=CC=CC=C4' --fpSize 512 --fpname mfp1 --t 0.5 --tag chembl_id morgan --radius 2
+The query to the mongo database can be done using the Query.py script in the codes folder. In Query script is a command line program where user should give smiles string(smi) , database name to search(db) , the tag name of ids which is given for generation of original database(tag) , size of the fingerprint(fpsize) and its parameters for generation of similar type of fingerprint and fingperprint name (fpname) as given in the search database (ex: mfp1). Below shows the script how it is executed. 
+MongoDB version 2.6 introduced some new aggregation features that may have better performance. Of particular interest is the $setIntersection operator, which is exactly what we need to calculate the number of bits in common between two fingerprints.
+
 ```
+$ python query.py -h
+usage: query.py [-h] --db DB --smi SMI [--fpSize FPSIZE] --fpname FPNAME
+                   [--t T] [--tag TAG]
+                   {morgan,rdkfp,rdmaccs} ...
 
-Check the Readme.pdf for usage or email abhik1368@gmail.com 
+## Example showing how the query is executed
+$ python query.py --db chembldb --smi 'CC1=NN=C2N1C3=C(C=C(C=C3)Cl)C(=NC2)C4=CC=CC=C4' --fpSize 512 --fpname mfp1 --t 0.8 --tag chembl_id morgan --radius 2
+
+fingerprints mfp1 done ...
+start Aggregate .. 
+response done .. 
+Hits:  6 Time :  0.0532460212708
+1.0: 450819
+0.952380952381: 19002642
+1.0: 2118
+0.952380952381: 178274
+0.813953488372: 12562523
+0.818181818182: 21489341
+
+```
