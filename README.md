@@ -4,15 +4,15 @@ Big_data_Project
 # Automated Code to Build and search a Chemistry database using Mongo DB by Sharding
 
 Script ideas from Matt Swain https://github.com/mcs07/mongodb-chemistry
-The scripts generates database and adds fingerprints and perform search.For configuring Mongo DB across multiple machine Cloudmesh Python API is used . The vmstart.py code starts the ubuntu machines as shard machines in India grid and write, executes the filescript.sh script given below in the box.
+The scripts generates database and adds fingerprints and perform search.For configuring Mongo DB across multiple machine Cloudmesh Python API is used . The vmstart.py code starts the ubuntu machines as shard machines in India grid and write, executes the filescript.sh script given in codes folder. The script creates shard folder and set the permissions and also download and installs mongo db on different sets of machines.
 
-### Required tools
+#### Required tools
  * RDKit
  * Pymongo
  * Mongo DB
  * cloudmesh
 
-### Setting up the machines
+#### Setting up the machines
 
 Config servers are like the brains of the cluster: they hold all of the metadata about which servers hold what data.Thus, they must be set up first and the data they hold is extremely important. Each config server should be on a separate physical machine .For the config server and mongos router separatelya VMs are started and Mongo DB is installed on it. The config servers must be started before any of the mongos processes, as mongos pulls its configuration from them. Config servers are standalone mongod processes, and it is started as the same way as normal mongod processes. For production purposes it is recomended to use 3 config servers and for testing puporses one config server is fine to go with. Also we start the shard servers on each of the VMs using the command given below. After shard servers,config servers and and router server is ready we copy the ssh keys to each of the machines for secure data transfer between machines.
 
