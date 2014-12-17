@@ -148,29 +148,24 @@ if __name__ == '__main__':
 
     dbconn="pymongo.MongoClient('localhost', 27017)."+ args['db']
     db = eval(dbconn)
+    db.admin.command(
+        'shardCollection', args['db']+'.'+args['fpname'], key={'_id': hashed})
     if args['which'] == 'morgan':
         if args['fpSize'] is None and args['radius'] is None:
-            #build_db(args['i'], args['tag'])
             add_fps(args['fpname'],fpSize=512,rad=2)
         elif args['fpSize'] is None:
-            #build_db(args['i'], args['tag'])
             add_fps(args['fpname'],fpSize=512,rad=args['radius'])
         elif args['radius'] is None :
-            #build_db(args['i'], args['tag'])
             add_fps(args['fpname'],fpSize=args['fpSize'],rad=2)
         else:
-            #build_db(args['i'], args['tag'])
             add_fps(args['fpname'],fpSize=args['fpSize'],rad=args['radius'])
 
     elif args['which'] == 'rdkfp':
         if args['fpSize'] is None and args['minPath'] is None and args['maxPath'] is None and args['nBitsPerHash'] is None :
-            #build_db(args['i'], args['tag'])
             add_fps(args['fpname'],fpSize=512,minPath=1,maxPath=7,nBitsh=2)
         elif args['minPath'] is None and args['maxPath'] is None and args['nBitsPerHash'] is None :
-            #build_db(args['i'], args['tag'])
             add_fps(args['fpname'],fpSize=args['fpSize'],minPath=1,maxPath=7,nBitsh=2)
         else:
-            #build_db(args['i'], args['tag'])
             add_fps(args['fpname'],fpSize=args['fpSize'],minPath=args['minPath'],maxPath=args['maxPath'],nBitsh=args['nBitsPerHash'])
     elif args['which'] == 'rdmaccs':
         add_fps(args['fpname'])
