@@ -38,19 +38,19 @@ Mongo DB won’t distribute your data automatically until we explicitly tell whi
 >sh.shardCollection("chembldb.mfp1_counts", { "_id": "hashed" } )  
 ```
 
-### To build a database
- * db_build.py  
- * addfps.py
- * query.py
+### To build a database of fingerprints 
+To build a chemical database of fingerprints use the db\_build.py program in the codes folder. Before using db\_build program one needs to install the Pymongo and RDKit chemical toolkit . In ubuntu machines it is installed using 
+```
+pip install pymongo
+sudo apt-get install python-rdkit librdkit1 rdkit-data
+```
+db\_build.py is a command line argument program where one can input .sdf,.sdf.gz and .smi format, the pattern of fingerprint, fingerprint length and fingerprint tag name . Currently morgan type, RDKFingerprint and rdkit maccs keys are supported.
 
-
-A small dataset is given in data directory to test 
-
-##3 Usage
+#### Usage of db_build.py
 ```
 python db_build.py -h
-
 python db_build.py --db moltest--i benzodiazepine.smi --tag chembl_id --fpname mfp1 morgan
+```
 
 python addfps.py -h
 
